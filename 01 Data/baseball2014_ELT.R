@@ -1,6 +1,6 @@
 setwd("~/Assignments/UT Austin/Data Vis/DV_RProject3/01 Data") ###
 
-file_path <- "baseball.csv"
+file_path <- "baseball2014.csv"
 
 baseball <- read.csv(file_path, stringsAsFactors = FALSE)
 
@@ -9,7 +9,7 @@ names(baseball) <- gsub("\\.+", "_", names(baseball))
 
 str(baseball) # Uncomment this and  run just the lines to here to get column types to use for getting the list of measures.
 
-measures <- c("Rk","Age","G","PA","AB","R","H","doubles","triples","HR","RBI","SB","CS","BB","SO","BA",	"OBP","SLG","OPS","TB","GDP","HBP","SH","SF","IBB")
+measures <- c("Rk","Age","G","PA","AB","R","H","doubles","triples","HR","RBI","SB","CS","BB","SO","BA",  "OBP","SLG","OPS","TB","GDP","HBP","SH","SF","IBB")
 #measures <- NA # Do this if there are no measures.
 
 # Get rid of special characters in each column.
