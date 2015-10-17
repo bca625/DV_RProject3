@@ -39,7 +39,18 @@ baseball_teams <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest
 baseball_pitching <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from baseball_pitching"'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', USER='cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))
 ```
 
-The joins functions of the dplyr package allow us to produce some intersting visualization from two datasets at  time.
+Lets take a peak at what some of the data looks like.
+```{r, warning=FALSE, message=FALSE}
+head(baseball)
+head(baseball_teams)
+head(baseball_pitching)
+```
+
+```{r, warning=FALSE, message=FALSE}
+summary(baseball)
+```
+
+The join functions of the dplyr package allow us to produce some intersting visualization from two datasets at  time.
 
 The first function we use is the anti join function. The anti join returns only rows from one table that are not found in the other. By using an anti join between the 2015 batting statistics and the 2014 batting statistics, we were effectivley able to obtain a data set containing only rookie MLB players.
 ```{r, warning=FALSE, message=FALSE}
