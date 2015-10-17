@@ -1,5 +1,5 @@
 #Plot National League Rookie RBIs by Team
-washedNL <- retirees %>% select(TM, NAME, RBI, LG) %>% filter(LG=="NL")
+washedNL <- retirees %>% select(TM, NAME, RBI, LG, AGE) %>% filter(LG=="NL")
 
 ggplot() + 
   coord_cartesian() + 

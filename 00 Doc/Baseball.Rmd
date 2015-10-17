@@ -78,7 +78,7 @@ source("../02 Data Wrangling/washedAL.R", echo=TRUE)
 source("../02 Data Wrangling/washedNL.R", echo=TRUE)
 ```
 
-
+To our surpirse, we see that ages are all over the place. This shows that more factors than age that force players into retirement or missed season. Players could be out due to injuries, suspensions, or maybe they just were good enough to cut it in the major league. Such is the cruel world that is professional sports.
 
 In 1973, the American League adopted the "Designated Hitter Rule" which allowed teams to appoint one player, the designated hitter, to bat in place of the teams pitcher. This substitution helps pitchers avoid injuries that could happen while at bat and simultaneously saves us fans from having to watch these God-awful pitchers struggle to get a hit. Fortunately, or unfortunately depending on who you ask, the National League has yet to adopt this rule leading to an asymmetry in the offense between the two leagues. We want to visualize just how often American League pitchers are opting out of batting compared to their National League counterparts. 
 
@@ -94,16 +94,21 @@ source("../02 Data Wrangling/pitcher_at_bats.R", echo=TRUE)
 
 Just as we expected, there are a lot more pitchers with zero at bats in the American League as compared to the National League due the Designated Hitter Rule. The rule has been a polarizing topic of discussion in baseball for some time now, with many different factions debating how to standardize the two leagues or if standardization is even necessary.
 
+
+
+Baseball is very much a team sport, especiialy on the offense. Unlike basketball, where a player (read: God) like Lebron James or Kevin Durant can score half of their team's points on their own if need be, baseball relies on a batting order that mandates every player get the same number of at bats. This makes it difficult for any single baseball player to "put the team on their back". To get a glimpse of just how much a load some of these players carry for their team, we use a full(or outer) join to compare each players batting statistics to the total batting numbers of their team.
 ```{r, warning=FALSE, message=FALSE}
 joinbyteam <- dplyr::full_join(baseball, baseball_teams, by="TM") %>% tbl_df
 ```
 
-
-
+Using some crafty data wrangling a la the mutate function, we create another column in the data set showing just what percentage of the teams runs each player batted in. We arrange the data set by descending percentage to see which players put on the most for their team.
 ```{r, warning=FALSE, message=FALSE }
 source("../02 Data Wrangling/team_on_back.R", echo=TRUE)
 ```
 
+We see that Nolan Arenado of the Colorado Rockies has batted in a higher percentage of his teams runs than anyone else in the major leagues at 17.64%.
+ 
+Which teams really relied on their stars for runs? Which teams split the load amongst their roster? To answer these questions we plot the percentage of runs scored by each player and group them by team, separating American League teams and National League teams into different plots.
 ```{r, warning=FALSE, message=FALSE }
 source("../02 Data Wrangling/teamOnBackAL.R", echo=TRUE)
 ```
@@ -111,3 +116,5 @@ source("../02 Data Wrangling/teamOnBackAL.R", echo=TRUE)
 ```{r, warning=FALSE, message=FALSE }
 source("../02 Data Wrangling/teamOnBackNL.R", echo=TRUE)
 ```
+
+In the American League we see a decent number of teams relying on select players for a large amount of their runs, while in the National League we see team like the New York Mets and Philadelphia Phillies where the scoring is distributed a bit more evenly than other teams.
