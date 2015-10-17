@@ -64,6 +64,26 @@ ggplot() +
   )
 
 
+#Plot National League Rookie RBIs by Team
+washedNL <- retirees %>% select(TM, NAME, RBI, LG) %>% filter(LG=="NL")
+
+ggplot() + 
+  coord_cartesian() + 
+  scale_x_discrete() +
+  scale_y_continuous() +
+  labs(title='National League Retiree Age by Team') +
+  labs(x="Team", y=paste("Runs Batted In")) +
+  layer(data=washedNL, 
+        mapping=aes(x=TM, y=as.numeric(as.character(AGE)), color=as.character(TM)), 
+        stat="identity", 
+        stat_params=list(),
+        geom="point",
+        geom_params=list(), 
+        #position=position_identity()
+        position=position_jitter(width=0.3, height=0)
+  )
+
+
 
 #National League Pitchers (Talk about Designated Hitter Rule)
 pitchersAB <- pitchers %>% select(TM.x, NAME, RBI, AB, ERA, LG.x)%>%filter(LG.x != "MLB")

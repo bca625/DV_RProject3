@@ -5,12 +5,10 @@
 ===
   **Bryan Amaefule, Shannon Lu, Kevin Lee**
 
-For our project we chose to analyze the batting and pitching statistic for Major League Baseball Players 
-for the 2015 season. The 2015 season is still in session statistics are only up to October 15, 2015.
+For our project we chose to analyze the batting and pitching statistic for Major League Baseball Players for the 2015 season. Data was taken from baseball-reference.com. The 2015 season is still in session, so statistics are only accurate up to October 15, 2015.
 
 
-**Load require R packages**: As with all projects, it is first necessary to load the required packages into 
-our R enviroment.
+**Load require R packages**: As with all projects, it is first necessary to load the required packages into our R enviroment.
 
 ```{r, warning=FALSE, message=FALSE}
 require("tidyr")
@@ -22,74 +20,85 @@ require("ggplot2")
 ```
 
 
-**Reformat CSV files and load them into Oracle**: Using the code provided in the R_ELT file, we reformat 
-each of the CSV files used in our project to suitable formats for insertion into the Oracle databases. The 
-most important part of this step is making sure all numerical variables are properly formatted. We modify 
-the measures vector to contain the titles of column with numerical values. We use the column names from the 
-"baseball.csv" file as an example below.
+**Reformat CSV files and load them into Oracle**: Using the code provided in the R_ELT file, we reformat each of the CSV files used in our project to suitable formats for insertion into the Oracle databases. The most important part of this step is making sure all numerical variables are properly formatted. We modify the measures vector to contain the titles of column with numerical values. We use the column names from the "baseball.csv" file as an example below.
 
 ```{r}
-measures <- c("Rk","Age","G","PA","AB","R","H","doubles","triples","HR","RBI","SB","CS","BB","SO","BA",  
-"OBP","SLG","OPS","TB","GDP","HBP","SH","SF","IBB")
+measures <- c("Rk","Age","G","PA","AB","R","H","doubles","triples","HR","RBI","SB","CS","BB","SO","BA",  "OBP","SLG","OPS","TB","GDP","HBP","SH","SF","IBB")
 ```
 
 
-**Load data tables from Oracle database**: We load each the Oracle data tables into our environment using the code provided from the Titanic Analysis.
+**Load data tables from Oracle database**: We load each the Oracle data tables into our environment using the code provided from the Titanic Analysis. We use four data sets including: batting statisitcs from 2015 season, batting statistics from 2014 season, team batting averages, pitching statistics from 2015 season.
 
 ```{r, warning=FALSE, message=FALSE}
-baseball <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from 
-baseball"'),httpheader=c
-(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', 
-USER='cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', 
-returnFor = 'JSON'), verbose = TRUE), ))
+baseball <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from baseball"'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', USER='cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))
 
-baseball2014 <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from 
-baseball2014"'),httpheader=c
-(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', 
-USER='cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', 
-returnFor = 'JSON'), verbose = TRUE), ))
+baseball2014 <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from baseball2014"'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', USER='cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))
 
-baseball_teams <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * 
-from baseball_teams"'),httpheader=c
-(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', 
-USER='cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', 
-returnFor = 'JSON'), verbose = TRUE), ))
+baseball_teams <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from baseball_teams"'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', USER='cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))
 
-baseball_pitching <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * 
-from baseball_pitching"'),httpheader=c
-(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', 
-USER='cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', 
-returnFor = 'JSON'), verbose = TRUE), ))
+baseball_pitching <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select * from baseball_pitching"'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDBF15DV.usuniversi01134.oraclecloud.internal', USER='cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON'), verbose = TRUE), ))
 ```
 
+The joins functions of the dplyr package allow us to produce some intersting visualization from two datasets at  time.
 
-```{r, warning=FALSE, message=FALSE}
-joinbyteam <- dplyr::full_join(baseball, baseball_teams, by="TM") %>% tbl_df
-```
-
+The first function we use is the anti join function. The anti join returns only rows from one table that are not found in the other. By using an anti join between the 2015 batting statistics and the 2014 batting statistics, we were effectivley able to obtain a data set containing only rookie MLB players.
 ```{r, warning=FALSE, message=FALSE}
 newbies <- dplyr::anti_join(baseball, baseball2014, by="NAME") %>% tbl_df
 ```
 
-```{r, warning=FALSE, message=FALSE}
-retirees <- dplyr::anti_join(baseball2014, baseball, by="NAME") %>% tbl_df
-```
+In order to visualize just how these rookies contribute to their teams, we plot their runs batted in (RBIs) grouped by team. RBI is a statistc that credits batters a batter for making a play that allows a run to be scored. You won't see many feel-good baseball movies end on an RBI, but this is the principle method of scoring in baseball, as opposed to grand slams, home runs, and balls knocked out of the park. 
 
-```{r, warning=FALSE, message=FALSE}
-pitchers <- dplyr::inner_join(baseball, baseball_pitching, by="NAME") %>% tbl_df
-```
+We our visualizations into two plots separated by league just so the plot isnt too crowded. 
+First we show rookies in the American League.
 
 ```{r, warning=FALSE, message=FALSE }
 source("../02 Data Wrangling/AL_Rookie_RBIs.R", echo=TRUE)
 ```
 
+Then we show National League rookies.
 ```{r, warning=FALSE, message=FALSE }
 source("../02 Data Wrangling/NL_Rookie_RBIs.R", echo=TRUE)
 ```
 
+We see that a good portion of the rookies have already put some numbers on the board. Looking at the National League rookies, Kris Bryant of the Chicago Cubs stands out amongst all the rest with an impressive 99 runs batted in.
+
+
+
+Our first anti join function gave us rough data set of all the rookies. By reversing that anti join, we should be able obtain a data set of players who retired this, or for some other reason, have sat this season out.
+```{r, warning=FALSE, message=FALSE}
+retirees <- dplyr::anti_join(baseball2014, baseball, by="NAME") %>% tbl_df
+```
+
+Logically, we would expect this data set to be full of a bunch of washed up old guys. once again we separate into two visualizations grouped by league.
+```{r, warning=FALSE, message=FALSE }
+source("../02 Data Wrangling/washedAL.R", echo=TRUE)
+```
+
+```{r, warning=FALSE, message=FALSE }
+source("../02 Data Wrangling/washedNL.R", echo=TRUE)
+```
+
+
+
+In 1973, the American League adopted the "Designated Hitter Rule" which allowed teams to appoint one player, the designated hitter, to bat in place of the teams pitcher. This substitution helps pitchers avoid injuries that could happen while at bat and simultaneously saves us fans from having to watch these God-awful pitchers struggle to get a hit. Fortunately, or unfortunately depending on who you ask, the National League has yet to adopt this rule leading to an asymmetry in the offense between the two leagues. We want to visualize just how often American League pitchers are opting out of batting compared to their National League counterparts. 
+
+None of the data sets we acquired show both batting and pitch statistics together, however, using an inner join, we can create such a data set ourselves. The inner join returns only rows found in both data sets, so by joining the batting and pitching statistics by player name we obtain a data set that includes the batting numbers for each pitcher.
+```{r, warning=FALSE, message=FALSE}
+pitchers <- dplyr::inner_join(baseball, baseball_pitching, by="NAME") %>% tbl_df
+```
+
+By plotting the "At Bats" for each pitcher and grouping them by league, we can see just how often pitchers from each league are stepping up to the plate. We'd expect many of the American League pitchers to have zero at bats if they are choosing to let their designated hitters bat for them.
 ```{r, warning=FALSE, message=FALSE }
 source("../02 Data Wrangling/pitcher_at_bats.R", echo=TRUE)
 ```
+
+Just as we expected, there are a lot more pitchers with zero at bats in the American League as compared to the National League due the Designated Hitter Rule. The rule has been a polarizing topic of discussion in baseball for some time now, with many different factions debating how to standardize the two leagues or if standardization is even necessary.
+
+```{r, warning=FALSE, message=FALSE}
+joinbyteam <- dplyr::full_join(baseball, baseball_teams, by="TM") %>% tbl_df
+```
+
+
 
 ```{r, warning=FALSE, message=FALSE }
 source("../02 Data Wrangling/team_on_back.R", echo=TRUE)
