@@ -85,9 +85,47 @@ ggplot() +
   )
 
 
-#Plot the percentage of Runs batted in by a single Player
-teamOnBack <- joinbyteam %>% select(TM, NAME, RBI.x, R.y)%>%filter(TM != "TOT") %>% mutate(freq = (as.numeric(as.character(RBI.x))/R.y)*100) %>% arrange(desc(freq))
 
-head(teamOnBack)
+#Plot the percentage of Runs batted in by a single Player
+teamOnBack <- joinbyteam %>% select(TM, AGE, NAME, RBI.x, R.y, LG)%>%filter(TM != "TOT", TM != "null",TM != "LgAvg") %>% mutate(freq = (as.numeric(as.character(RBI.x))/R.y)*100) %>% arrange(desc(freq))
+
+teamOnBackAL <- teamOnBack %>% filter(LG == "AL")
+
+ggplot() + 
+  coord_cartesian() + 
+  scale_x_discrete() +
+  scale_y_continuous() +
+  labs(title='Player Run Percentage By Team (American League)') +
+  labs(x="Team", y=paste("Run Percentage")) +
+  layer(data=teamOnBackAL, 
+        mapping=aes(x=TM, y=freq, color=as.character(TM)), 
+        stat="identity", 
+        stat_params=list(),
+        geom="point",
+        geom_params=list(), 
+        #position=position_identity()
+        position=position_jitter(width=0.3, height=0)
+  )
+
+
+teamOnBackNL <- teamOnBack %>% filter(LG == "NL")
+
+ggplot() + 
+  coord_cartesian() + 
+  scale_x_discrete() +
+  scale_y_continuous() +
+  labs(title='Player Run Percentage By Team (National League)') +
+  labs(x="Team", y=paste("Run Percentage")) +
+  layer(data=teamOnBackNL, 
+        mapping=aes(x=TM, y=freq, color=as.character(TM)), 
+        stat="identity", 
+        stat_params=list(),
+        geom="point",
+        geom_params=list(), 
+        #position=position_identity()
+        position=position_jitter(width=0.3, height=0)
+  )
+
+
 
 #df <- rename(baseball, tbl = table) # table is a reserved word in Oracle so rename it to tbl.
