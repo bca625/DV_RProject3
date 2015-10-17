@@ -1,7 +1,7 @@
 ---
   output: html_document
 ---
-  Data Visualization Project 3: Major League Baseball Batting and Pitching Statistics for the 2014 Season
+  Data Visualization Project 3: Major League Baseball Batting and Pitching Statistics for the 2015 Season
 ===
   **Bryan Amaefule, Shannon Lu, Kevin Lee**
 
